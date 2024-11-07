@@ -1,0 +1,21 @@
+.shadow-text {
+/*    color: #000000;*/
+    text-shadow: 0 0 15px #6cb777;
+    filter: drop-shadow(0 0 10px #ec531e);
+}
+
+.shadow-Anonymous {
+/*    color: #000000;*/
+    text-shadow: 0 0 11px #650808;
+    filter: drop-shadow(0 0 11px #f15532);
+    text-align: center
+}
+
+h2 {
+    color: #d86b11;
+}
+
+h3 {
+    color: #1b1c1c;
+    font-size: 4px;
+}

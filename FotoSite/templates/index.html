@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block css_style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='background.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='button.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='text.css') }}">
+{% endblock %}
+
+{% block content %}
+<div style="text-align: center;">
+    {% if current_user.is_authenticated %}
+    <form id="uploadFile" method="POST" enctype="multipart/form-data" action="{{ url_for('upload_file') }}">
+        <h2>Загрузите фотографию в коллекцию альбома</h2>
+        <input type="file" class="tabLink" style="background-color: rgb(216, 195, 14); box-shadow: None;"
+               accept="image/png, image/jpeg" name="uploaded_files" multiple required/>
+        <button type="submit" class="tabLink" style="background-color: rgb(216, 195, 14); box-shadow: None;">
+            Загрузить
+        </button>
+    </form>
+
+    <!-- Пагинация -->
+    <div class="pagination">
+        {% if has_prev %}
+        <a style="color: #ec531e; text-decoration: none;" href="?page=1">[Первая]</a>
+        <a style="color: #ec531e; text-decoration: none; font-size: 22px;" href="?page={{ page - 1 }}">Предыдущая</a>
+        {% endif %}
+
+        <span class="current" style="color: #6cb777;">Страница {{ page }} из {{ total_pages }}</span>
+
+        {% if has_next %}
+        <a style="color: #ec531e; text-decoration: none; font-size: 22px;" href="?page={{ page + 1 }}">Следующая</a>
+        <a style="color: #ec531e; text-decoration: none;" href="?page={{ total_pages }}">[Последняя]</a>
+        {% endif %}
+    </div>
+
+    <!-- Фото лист -->
+    <div class="foto-container">
+        {% for date, fotos in page_obj %}
+        <div style="box-shadow: inset 0 0 30px rgba(237,83,30,0.3); border-radius: 22px;">
+            <h2>{{ date }} </h2>
+
+            <div class="date-photos">
+                {% for foto in fotos %}
+                {% if loop.index0 % 6 == 0 %}
+            </div>
+            <div class="date-photos">
+                {% endif %}
+                <div class="userFoto" style="display: inline-block; margin: 5px;">
+                    <a href="{{  url_for('static', filename=foto.image_path) }}">
+                        <img src="{{  url_for('static', filename=foto.image_path) }}"
+                             onerror="this.src='https://otvet.imgsmail.ru/download/8827816_18d2440457725e7740e47c172c0a6de8.jpg'"
+                             alt="Фото">
+                    </a>
+                    <!-- Удаление фото -->
+                    <form action="{{ url_for('delete_image', image_id=foto.id) }}" method="post">
+                        <button class="ButtonDelete" type="submit">Удалить</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% else %}
+        <div class="photoNotFound">
+            <img src="https://rdstroy.ru/upload/images/335515/big/photo2.jpg" alt="Фото не найдено">
+        </div>
+        <h2>Нет загруженных фотографий</h2>
+        {% endfor %}
+    </div>
+    <!-- Пагинация -->
+    <div class="pagination">
+        {% if has_prev %}
+        <a style="color: #ec531e; text-decoration: none;" href="?page=1">[Первая]</a>
+        <a style="color: #ec531e; text-decoration: none; font-size: 22px;" href="?page={{ page - 1 }}">Предыдущая</a>
+        {% endif %}
+
+        <span class="current" style="color: #6cb777;">Страница {{ page }} из {{ total_pages }}</span>
+
+        {% if has_next %}
+        <a style="color: #ec531e; text-decoration: none; font-size: 22px;" href="?page={{ page + 1 }}">Следующая</a>
+        <a style="color: #ec531e; text-decoration: none;" href="?page={{ total_pages }}">[Последняя]</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <h1 class="shadow-Anonymous">{{ AnonymousUser }}</h1>
+    <div class="button-container">
+        <div class="cButton" style="width: 100px;" onclick="window.location.href='{{ url_for('authorization') }}'">
+            Вход
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

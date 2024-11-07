@@ -1,0 +1,36 @@
+body {
+    background-color: #2b2d30;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Выравнивание по вертикали */
+}
+
+.tab-headerLeft,
+.tab-headerRight {
+    display: flex;
+}
+
+.photoNotFound img {
+    margin-top: 10px; /* Отступ с верху */
+    max-width:300px; /* Размер изображения по ширине */
+    height:auto; /* Размер изображения по высоте авто */
+    border-radius: 15px; /* Закругление углов */
+}
+
+.userFoto img {
+    margin-top: 10px; /* Отступ с верху */
+    max-width:200px; /* Размер изображения по ширине */
+    max-height:200px; /* Размер изображения по высоте авто */
+    border-radius: 15px; /* Закругление углов */
+    width: auto; /* Автоматическая ширина для сохранения пропорций */
+    height: auto; /* Автоматическая высота для сохранения пропорций */
+    box-shadow: 0 0 25px rgba(0, 0, 0, 1); /* Внешнее свечение */
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}

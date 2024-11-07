@@ -1,0 +1,31 @@
+/* Стили для сообщений об ошибках и успешных операциях */
+.error {
+/* Цвет текста */
+    color: #ff0000;
+    /* Выравнивание текста */
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    /* Анимация */
+    animation: errorAnim 0.9s ease-in-out;
+}
+
+/* Анимация */
+@keyframes errorAnim {
+    25% { transform: translateX(-20px); }
+    75% { transform: translateX(20px); }
+}
+
+.message {
+    color: green;
+    /* Выравнивание текста */
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    border-radius: 15px;
+    text-shadow:
+    -1px -1px 2px #000000,
+    1px -1px 2px #000000,
+    -1px 1px 2px #000000,
+    1px 1px 2px #000000;
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ TitlePage }}</title>
+
+    {% block css_style %}
+    {% endblock %}
+</head>
+<body>
+<header>
+    <div class="tab-headerLeft">
+        {% if btnHomeVisible %}
+        <div class="fButton" onclick="window.location.href='{{ url_for('index') }}'">🏠︎</div>
+        {% endif %}
+    </div>
+
+    <h1 class="shadow-text">{{ TextPage }}</h1>
+
+    <div class="tab-headerRight">
+        {% block tabMenu %}
+
+        {% endblock %}
+        {% if btnAuthenticatedVisible %}
+        {% if current_user.is_authenticated %}
+        <div class="fButton" onclick="window.location.href='{{ url_for('logout') }}'">Выйти из {{current_user.username}}</div>
+        {% else %}
+        <div class="fButton" onclick="window.location.href='{{ url_for('authorization') }}'">Вход</div>
+        {% endif %}
+        {% endif %}
+    </div>
+</header>
+
+{% block content %}
+{% endblock %}
+</body>
+</html>

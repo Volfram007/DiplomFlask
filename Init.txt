@@ -1,0 +1,37 @@
+** Клонируем проект **
+   Кнопка создания проекта "from Version Control"
+   Вкладка Repository URL > URL > https://github.com/***.git
+   В терминале:
+   python -m venv venv
+   .\venv\Scripts\activate
+   python.exe -m pip install --upgrade pip
+
+   Вкладка Project Structure (Ctrl+Alt+Shift+S)
+   Вкладка Project
+   SDK > Add Python SDK
+   > Existing environment > кнопка "..."
+   (Подтверждаем путь к папке с \venv\Scripts\python.exe)
+***********************
+
+** ЗАВИСИМОСТИ **
+    pip install Flask Jinja2 Flask-SQLAlchemy Flask-Login Flask-Migrate Flask-WTF flask-paginate
+    pip install Flask flask-paginate Flask-SQLAlchemy Flask-Login
+    pip freeze > requirements.txt
+
+    Удалите все пакеты, используя полученный список:
+    pip uninstall -r requirements.txt -y
+***********************
+
+** СОЗДАНИЕ БД **
+    python
+    from create_db import app, db
+    app.app_context().push()
+    db.create_all()
+***********************
+
+** Конфигурация запуска **
+	"Конфигурация" == Python
+	module == flask
+	"Script parameters" == run
+	"Environment .." == PYTHONUNBUFFERED=1;flask_app=start.py
+***********************
