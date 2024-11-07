@@ -18,17 +18,18 @@
 
 {% block content %}
 <form id="auth-form" class="tab-content active" method="POST">
-    <input type="hidden" id="form_act" name="form_act" value="{{ form_act|default('login') }}">
+    <input type="hidden" id="form_act" name="form_act" value="{{ form_act|default('login') }}"/>
 
     <h3 id="title-form">Вход</h3>
-    <input type="text" name="username" maxlength="30" id="id_username" placeholder="Логин" required>
-    <input type="password" name="password1" minlength="1" id="id_password1" placeholder="Пароль" required>
+    <label>
+        <input type="text" name="username" maxlength="30" id="id_username" placeholder="Логин" required/>
+        <input type="password" name="password1" minlength="1" id="id_password1" placeholder="Пароль" required/>
 
-    <div id="register-form" class="{% if form_act == 'register' %}visible{% else %}hidden{% endif %}">
-        <input type="password" name="password2" minlength="1" id="password2"
-               placeholder="Повторите пароль">
-    </div>
-
+        <span id="register-form" class="{% if form_act == 'register' %}visible{% else %}hidden{% endif %}">
+            <input type="password" name="password2" minlength="1" id="password2"
+                   placeholder="Повторите пароль"/>
+        </span>
+    </label>
     <div class="button-container">
         <button class="cButton" type="submit" id="submit-button">Войти</button>
     </div>
