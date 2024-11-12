@@ -9,12 +9,15 @@ from FotoSite.models import User, ImageModel
 from FotoSite.InitText import *
 
 
-@app.route('/index')
+@app.route("/index")
 def index():
+    """
+    Главная функция для отображения страницы с фотографиями пользователя.
+    """
     error = None
     paginated = []
     per_page = 3  # количество записей на странице
-    page = request.args.get('page', 1, type=int)  # текущая страница
+    page = request.args.get("page", 1, type=int)  # текущая страница
     total_pages = 0
     has_next = 0
     has_prev = 0
@@ -23,18 +26,24 @@ def index():
         sort_date = {}
 
         # Получение всех фотографий текущего пользователя из базы данных, отсортированных по дате в порядке убывания
-        foto_all = ImageModel.query.filter_by(user_id=current_user.id).order_by(desc(ImageModel.date)).all()
+        foto_all = (
+            ImageModel.query.filter_by(user_id=current_user.id)
+            .order_by(desc(ImageModel.date))
+            .all()
+        )
         for foto in foto_all:
             # Преобразование даты в строку в формате 'дд.мм.гггг'
-            date_str = foto.date.strftime('%d.%m.%Y')
+            date_str = foto.date.strftime("%d.%m.%Y")
             if date_str not in sort_date:
                 sort_date[date_str] = []
             sort_date[date_str].append(foto)
 
         # Преобразование словаря в список
         list_foto = list(sort_date.items())
-        total_pages = (len(list_foto) + per_page - 1) // per_page  # общее количество страниц
-        paginated = list_foto[(page - 1) * per_page: page * per_page]
+        total_pages = (
+            len(list_foto) + per_page - 1
+        ) // per_page  # общее количество страниц
+        paginated = list_foto[(page - 1) * per_page : page * per_page]
 
         # Флаги для пагинации
         has_next = page < total_pages
@@ -42,7 +51,7 @@ def index():
     else:
         error = Error_NotAuthenticated
     return render_template(
-        'index.html',
+        "index.html",
         TitlePage=IndexTitlePage,
         TextPage=IndexTextPage,
         btnHomeVisible=True,
@@ -52,41 +61,43 @@ def index():
         total_pages=total_pages,
         has_next=has_next,
         has_prev=has_prev,
-        AnonymousUser=error
+        AnonymousUser=error,
     )
 
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/authorization', methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
+@app.route("/authorization", methods=["GET", "POST"])
 def authorization():
-    """ Авторизация и регистрация """
+    """
+    Обрабатывает авторизацию и регистрацию пользователей.
+    """
     error = None
     message = None
     if current_user.is_authenticated:
-        message = 'Вы авторизованы!'
+        message = "Вы авторизованы!"
 
     # Получение типа активной формы (вход или регистрация)
-    form_act = request.form.get('form_act', 'login')
-    if request.method == 'POST':
+    form_act = request.form.get("form_act", "login")
+    if request.method == "POST":
         # Получаем логин и пароль
-        username = request.form.get('username')
-        password1 = request.form.get('password1')
+        username = request.form.get("username")
+        password1 = request.form.get("password1")
 
         # Обработка действия формы, вход
-        if form_act == 'login':
+        if form_act == "login":
             user = User.query.filter_by(username=username).first()
             # Проверка, что пользователь существует и пароль верен
             if user and check_password_hash(user.password, password1):
                 # Вход пользователя в систему
                 login_user(user)
-                return redirect(url_for('index'))
+                return redirect(url_for("index"))
             else:
                 # Сообщение об ошибке при неверном логине или пароле
                 error = Error_LoginOrPassword
 
         # Обработка действия формы, регистрация
-        elif form_act == 'register':
-            password2 = request.form.get('password2')
+        elif form_act == "register":
+            password2 = request.form.get("password2")
 
             # Проверка на заполнение всех полей
             if not (username or password1 or password2):
@@ -108,21 +119,28 @@ def authorization():
                 db.session.commit()
                 # Вход пользователя в систему
                 login_user(new_user)
-                return redirect(url_for('index'))
-    return render_template('authorization.html',
-                           TitlePage=AuthTitlePage,
-                           btnHomeVisible=True,
-                           btnAuthenticatedVisible=False,
-                           error=error,
-                           message=message)
+                return redirect(url_for("index"))
+    return render_template(
+        "authorization.html",
+        TitlePage=AuthTitlePage,
+        btnHomeVisible=True,
+        btnAuthenticatedVisible=False,
+        error=error,
+        message=message,
+    )
 
 
 def user_directory_path(user_id, filename):
-    return f'images/{user_id}/{filename}'
+    return f"images/{user_id}/{filename}"
 
 
 def get_random_date():
-    """Генерируем случайное смещение от текущей даты"""
+    """
+    Генерирует случайную дату, смещенную от текущей даты на заданный диапазон.
+
+    Возвращает:
+    datetime: Объект даты и времени, смещенный на случайное количество дней в прошлое.
+    """
     import random
     from datetime import datetime
     from datetime import timedelta
@@ -131,34 +149,54 @@ def get_random_date():
     return datetime.now() + timedelta(days=random_days)
 
 
-@app.route('/upload_file', methods=['POST'])
+@app.route("/upload_file", methods=["POST"])
 @login_required
 def upload_file():
-    # Проверка наличия файла в запросе, если его нет, происходит перенаправление
-    if 'uploaded_files' not in request.files:
-        return redirect(url_for('index'))
+    """
+    Обрабатывает загрузку файлов пользователем и сохраняет информацию о них в базе данных.
 
-    for uploaded_file in request.files.getlist('uploaded_files'):
-        if uploaded_file.filename != '':
+    Декоратор:
+    @login_required : гарантирует, что функция доступна только для авторизованных пользователей.
+    """
+    # Проверка наличия файла в запросе, если его нет, происходит перенаправление
+    if "uploaded_files" not in request.files:
+        return redirect(url_for("index"))
+
+    for uploaded_file in request.files.getlist("uploaded_files"):
+        if uploaded_file.filename != "":
             filename = secure_filename(uploaded_file.filename)
             filepath = user_directory_path(current_user.id, filename)
-            full_path = os.path.join(current_app.root_path, 'static', filepath)
+            full_path = os.path.join(current_app.root_path, "static", filepath)
             # Создание всех необходимых промежуточных директорий, если их еще нет
             os.makedirs(os.path.dirname(full_path), exist_ok=True)
             uploaded_file.save(full_path)
             # Сохранение в базе данных
-            new_image = ImageModel(user_id=current_user.id, image_path=filepath, date=get_random_date())
+            new_image = ImageModel(
+                user_id=current_user.id, image_path=filepath, date=get_random_date()
+            )
             db.session.add(new_image)
             db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
-@app.route('/delete_image/<int:image_id>', methods=['POST'])
+@app.route("/delete_image/<int:image_id>", methods=["POST"])
 @login_required
 def delete_image(image_id):
-    image = ImageModel.query.filter_by(id=image_id, user_id=current_user.id).first_or_404()
+    """
+    Удаляет изображение из базы данных и файловой системы.
+
+    Параметры:
+    image_id : int
+        ID изображения, которое нужно удалить.
+
+    Декоратор:
+    @login_required : гарантирует, что функция доступна только для авторизованных пользователей.
+    """
+    image = ImageModel.query.filter_by(
+        id=image_id, user_id=current_user.id
+    ).first_or_404()
     # Получение пути к файлу изображения
-    image_path = os.path.join(current_app.root_path, 'static', image.image_path)
+    image_path = os.path.join(current_app.root_path, "static", image.image_path)
     # Удаление записи из базы данных
     db.session.delete(image)
     db.session.commit()
@@ -168,11 +206,14 @@ def delete_image(image_id):
             os.remove(image_path)
         except Exception as e:
             print(f"Ошибка при удалении файла: {e}")
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
 @app.route("/logout")
 @login_required
 def logout():
+    """
+    Выполняет выход пользователя из системы.
+    """
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))

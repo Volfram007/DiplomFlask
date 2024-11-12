@@ -12,8 +12,8 @@ class ImageModel(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     image_path = db.Column(db.String(150), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('images', lazy=True))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user = db.relationship("User", backref=db.backref("images", lazy=True))
 
 
 @manager.user_loader
